@@ -17,7 +17,7 @@ import _preprocess
 class docClassifier:
 	def __init__(self):
 		if os.path.isfile('unique_ngrams.p') :
-			self.unique_ngrms = pickle.load(open('unique_ngrms.p','rb'))
+			self.unique_ngrams = pickle.load(open('unique_ngrams.p','rb'))
 
 		else :
 			assert os.path.isdir(config.grams_dir)
@@ -29,6 +29,7 @@ class docClassifier:
  				ngrams.extend(ng)
 		
 			self.unique_ngrams = list(set(ngrams))
+			pickle.dump(self.unique_ngrams,open('unique_ngrams.p','wb'))
 			# release memory
 			del ngrams
 	
@@ -179,7 +180,7 @@ class docClassifier:
 			if i % 10 == 0:
 				print(" epoch = {} cost = {} ".format(i,c))
 
-		p = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(pred,axis=1),tf.argmax(pred,axis=1)),dtype=tf.float32))
+		p = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(pred,axis=1),tf.argmax(self.Y,axis=1)),dtype=tf.float32))
 		p = self.sess.run(p,{self.X: x_test, self.Y: y_test})
 		print("Accuracy on test set = {} %".format(p*100))
 
@@ -200,4 +201,5 @@ class docClassifier:
 
 dc = docClassifier()
 dc.trainAndValidate()
+
 dc.predict()
