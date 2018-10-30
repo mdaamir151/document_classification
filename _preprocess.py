@@ -1,20 +1,22 @@
 
 from nltk.stem.snowball import SnowballStemmer
+from nltk.stem.porter import PorterStemmer
 from nltk import ngrams
 from collections import Counter
 import glob
 import os
+import config
 
 """
 document files are inside indir directory
 """
 
 class preprocess:
-	def __init__(self,languageDir):
+	def __init__(self,languageDir,gram_size):
 		g = glob.glob(languageDir+'/*')
 		self.languages = [ l.split('/')[-1] for l in g ]
 		self.num_classes = len(self.languages)
-		self.gram_sz = 3 # trigram
+		self.gram_sz = gram_size
 		lm = {}
 		fs = open('language_map.py','w')
 		fs.write('lang_map = {\n')
@@ -53,9 +55,9 @@ class preprocess:
 		lfiles = glob.glob(srcdir+'/*')
 		stemfiles = [os.path.join(targetdir,f.split('/')[-1]) for f in lfiles]
 
-		for (lowerf,stemf,lang) in zip(lfiles,stemfiles,self.languages):
+		for (lowerf,stemf) in zip(lfiles,stemfiles):
 			print("stemming ",lowerf)
-			stemmer = SnowballStemmer(lang)
+			stemmer = PorterStemmer()
 			f = open(lowerf,'r',encoding='ISO-8859-1')
 			x = f.read().split()
 			y = []
